@@ -1,11 +1,11 @@
 module.exports = [{
   identity: 'role',
-  connection: 'mongo',
+  connection: 'localDisk',
   attributes: {},
   rest : true
 },{
   identity: 'rule',
-  connection: 'mongo',
+  connection: 'localDisk',
   attributes: {},
   rest : true
 }]
