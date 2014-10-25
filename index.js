@@ -10,6 +10,7 @@ var rbac = {
   expand : function( module ){
     if( module.acl ){
       _.extend( rbac.acl.roles, module.acl.roles )
+      //TODO different module may control same route
       _.extend( rbac.acl.routes, module.acl.routes)
     }
   },
@@ -39,10 +40,12 @@ var rbac = {
         applyResult.then(function(){
           req.session.user.roles = req.session.user.roles || []
           req.session.user.roles.push( rolesToApply[n] )
-        }).fin(function(){
+        }).catch(function(err){
+          if( err ) ZERO.error("rbac","apply roles error",err)
+        }).finally(function(){
           applyNext(++n)
         })
-      }else if(applyResult===true){
+      }else if(applyResult==true){
           req.session.user.roles = req.session.user.roles || []
           req.session.user.roles.push( rolesToApply[n] )
           applyNext(++n)
@@ -55,11 +58,17 @@ var rbac = {
     rbac.route = _.mapValues( this.acl.routes, function( rolesNeeded ){
       return {
         "function": function checkRole(req, res, next) {
-          _.intersection(req.session.user.roles, rolesNeeded).length == rolesNeeded.length ?
-            next() :
-            res.status(403).end()
+          var roles = req.session.user.roles||[]
+          var passed = _.every( rolesNeeded, function( role ){
+            var currentRoleToCheck = _.isString( role) ? role : role.role
+            if( roles.indexOf( currentRoleToCheck ) == -1){
+              role.redirect ? res.redirect( role.redirect ) :  res.status(403).end()
+              return false
+            }
+            return true
+          })
 
-          console.log(rolesNeeded,req.session.user.roles)
+          if( passed ) next()
         },
         "order" : {after:'rbac.applyRoleToCurrentUser'}
       }
