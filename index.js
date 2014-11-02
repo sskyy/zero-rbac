@@ -1,8 +1,8 @@
 var _ = require('lodash')
 
 function ensure(array,item){
-  if(!_.find(array,item)){
-    array.push( item)
+  if(array.indexOf(item)==-1){
+      array.push( item)
   }
   return array
 }
