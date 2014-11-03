@@ -35,18 +35,19 @@ var rbac = {
   applyRoleToCurrentUser : function applyRoleToCurrentUser(req, res,next){
 
     var  rolesToApply = Object.keys( rbac.acl.roles )
+    req.session.user.roles = req.session.user.roles || []
 
     applyNext(0)
 
     function applyNext( n ){
       if( !rolesToApply[n] ){
+        console.log("apply role done", req.session.user.roles)
         return next()
       }
 
       var applyResult = rbac.acl.roles[rolesToApply[n]]( req )
       if( applyResult && applyResult.then ){
         applyResult.then(function(){
-          req.session.user.roles = req.session.user.roles || []
           ensure(req.session.user.roles, rolesToApply[n] )
         }).catch(function(err){
           if( err ) ZERO.error("rbac","apply roles error",err)
@@ -54,7 +55,6 @@ var rbac = {
           applyNext(++n)
         })
       }else if(applyResult==true){
-          req.session.user.roles = req.session.user.roles || []
           ensure(req.session.user.roles, rolesToApply[n] )
           applyNext(++n)
       }else{
@@ -69,6 +69,7 @@ var rbac = {
           var roles = req.session.user.roles||[]
           var passed = _.every( rolesNeeded, function( role ){
             var currentRoleToCheck = _.isString( role) ? role : role.role
+            console.log("role needed===>",currentRoleToCheck, roles)
             if( roles.indexOf( currentRoleToCheck ) == -1){
               role.redirect ? res.redirect( role.redirect ) :  res.status(403).end()
               return false
