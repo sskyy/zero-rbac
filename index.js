@@ -71,6 +71,7 @@ var rbac = {
             var currentRoleToCheck = _.isString( role) ? role : role.role
             console.log("role needed===>",currentRoleToCheck, roles)
             if( roles.indexOf( currentRoleToCheck ) == -1){
+              req.bus.error(403,"user do not have role "+currentRoleToCheck)
               role.redirect ? res.redirect( role.redirect ) :  res.status(403).end()
               return false
             }
