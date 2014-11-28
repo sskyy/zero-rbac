@@ -1,7 +1,10 @@
 {
   "name": "zero-rbac",
-  "version": "0.0.10",
-  "description": "zero module",
+  "version": "0.0.11",
+  "keywords": [
+    "zero module"
+  ],
+  "description": "This module implement role based access control.",
   "zero": {
     "dependencies": {
       "request": "^0.0.1",

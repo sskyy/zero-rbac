@@ -1,6 +1,6 @@
 # zero-rbac #
 
-This module implying role based access control.
+This module implement role based access control.
 
 ## Usage ##
 
